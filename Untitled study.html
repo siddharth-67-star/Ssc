@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>9th SSC Exam Squad Planner</title>
+    <style>
+        :root {
+            --primary: #4e54c8;
+            --secondary: #8f94fb;
+            --bg: #f4f7f6;
+            --text: #333;
+            --card-bg: #ffffff;
+            --accent: #ff6b6b;
+            --sid-color: #38ef7d;
+            --mig-color: #ff9a9e;
+            --pra-color: #f6d365;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--bg) 0%, #e0eafc 100%);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            padding: 30px 20px;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            animation: fadeInDown 0.8s ease;
+        }
+
+        header h1 {
+            font-size: 2.2em;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+        }
+
+        /* Leaderboard Section */
+        .leaderboard-container {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+            animation: fadeIn 1.2s ease;
+        }
+
+        .leaderboard-title {
+            text-align: center;
+            font-size: 1.5em;
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .student-progress {
+            margin-bottom: 15px;
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+
+        .progress-bar-bg {
+            background: #eee;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        /* Striped animation for progress bars */
+        .progress-bar-fill::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.2) 25%, transparent 25%, transparent 50%, rgba(255,255,255,0.2) 50%, rgba(255,255,255,0.2) 75%, transparent 75%, transparent);
+            background-size: 20px 20px;
+            animation: moveStripes 1s linear infinite;
+        }
+
+        #fill-Siddharth { background: linear-gradient(to right, #11998e, var(--sid-color)); }
+        #fill-Miguell { background: linear-gradient(to right, #fecfef, var(--mig-color)); }
+        #fill-Pratham { background: linear-gradient(to right, #fda085, var(--pra-color)); }
+
+        /* User Selector Tabs */
+        .user-selector {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            position: sticky;
+            top: 10px;
+            z-index: 100;
+        }
+
+        .user-tab {
+            padding: 12px 25px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            background: white;
+            color: #666;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+        }
+
+        .user-tab:hover {
+            transform: translateY(-2px);
+        }
+
+        .user-tab.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 6px 15px rgba(78, 84, 200, 0.4);
+            transform: scale(1.05);
+        }
+
+        /* Subject Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+        }
+
+        .subject-card {
+            background: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeInUp 0.8s ease backwards;
+        }
+
+        .subject-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+        }
+
+        .subject-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .subject-title {
+            font-size: 1.4em;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .exam-date {
+            background: var(--accent);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .topic-list {
+            list-style: none;
+        }
+
+        .topic-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 12px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+        }
+
+        .topic-item:hover {
+            background: #f0f2f5;
+        }
+
+        .topic-item input[type="checkbox"] {
+            appearance: none;
+            width: 22px;
+            height: 22px;
+            border: 2px solid var(--primary);
+            border-radius: 5px;
+            margin-right: 15px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.3s;
+        }
+
+        .topic-item input[type="checkbox"]:checked {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            animation: popIn 0.3s ease;
+        }
+
+        .topic-item input[type="checkbox"]:checked::after {
+            content: '✔';
+            position: absolute;
+            color: white;
+            font-size: 14px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .topic-label {
+            font-size: 1.05em;
+            cursor: pointer;
+            flex-grow: 1;
+            transition: color 0.3s, text-decoration 0.3s;
+        }
+
+        .topic-item input[type="checkbox"]:checked ~ .topic-label {
+            color: #888;
+            text-decoration: line-through;
+        }
+
+        /* Animations */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes popIn { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        @keyframes moveStripes { 0% { background-position: 0 0; } 100% { background-position: 20px 0; } }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏆 Study Squad: Mission Finals 2026</h1>
+        <p>St. Vincent's High School | 9th SSC Board</p>
+    </header>
+
+    <div class="leaderboard-container">
+        <div class="leaderboard-title">Syllabus Completion Leaderboard</div>
+        
+        <div class="student-progress">
+            <div class="student-header">
+                <span>Siddharth</span>
+                <span id="text-Siddharth">0%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="fill-Siddharth"></div></div>
+        </div>
+
+        <div class="student-progress">
+            <div class="student-header">
+                <span>Miguell</span>
+                <span id="text-Miguell">0%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="fill-Miguell"></div></div>
+        </div>
+
+        <div class="student-progress">
+            <div class="student-header">
+                <span>Pratham</span>
+                <span id="text-Pratham">0%</span>
+            </div>
+            <div class="progress-bar-bg"><div class="progress-bar-fill" id="fill-Pratham"></div></div>
+        </div>
+    </div>
+
+    <div class="user-selector">
+        <button class="user-tab active" onclick="switchUser('Siddharth')" id="tab-Siddharth">Siddharth</button>
+        <button class="user-tab" onclick="switchUser('Miguell')" id="tab-Miguell">Miguell</button>
+        <button class="user-tab" onclick="switchUser('Pratham')" id="tab-Pratham">Pratham</button>
+    </div>
+
+    <div class="grid" id="subjects-container">
+        </div>
+
+    <script>
+        const syllabusData = [
+            { subject: "English", date: "27-03-2026", topics: ["Reading Comprehension (Prose)", "Poetry Analysis", "Grammar (Tenses, Voices)", "Writing Skills: Essay & Letter", "Writing Skills: Story & Report"] },
+            { subject: "German", date: "28-03-2026", topics: ["Vocabulary & Translations", "Grammar (Verbs & Cases)", "Reading Comprehension", "Basic Dialogue Writing"] },
+            { subject: "Hindi (F/C)", date: "30-03-2026", topics: ["Prose (Gadyakhand)", "Poetry (Padyakhand)", "Vyakaran (Grammar)", "Rachana Vibhag (Writing)", "Unseen Passages"] },
+            { subject: "Algebra", date: "01-04-2026", topics: ["Sets & Real Numbers", "Polynomials", "Ratio and Proportion", "Linear Equations", "Financial Planning & Statistics"] },
+            { subject: "History", date: "02-04-2026", topics: ["Sources of History & Post 1960", "Internal Challenges", "Economic Development", "Education & Empowerment", "Political Science Section"] },
+            { subject: "Marathi", date: "06-04-2026", topics: ["गद्य (Prose)", "पद्य (Poetry)", "व्याकरण (Grammar)", "उपयोजित लेखन (Writing Skills)"] },
+            { subject: "Science B", date: "07-04-2026", topics: ["Classification of Plants", "Ecosystem Energy Flow", "Microbes (Useful/Harmful)", "Environmental Management", "Life Processes & Heredity"] },
+            { subject: "Geometry", date: "08-04-2026", topics: ["Basic Concepts & Parallel Lines", "Triangles & Quadrilaterals", "Circle", "Co-ordinate Geometry", "Trigonometry & Surface Area"] },
+            { subject: "Science A", date: "09-04-2026", topics: ["Laws of Motion & Energy", "Current Electricity", "Matter Measurement & Acids/Bases", "Light & Sound", "Carbon"] },
+            { subject: "Geography", date: "10-04-2026", topics: ["Distributional Maps", "Endogenetic Movements", "Exogenetic Processes", "Precipitation & Sea Water", "Economics Intro"] }
+        ];
+
+        const container = document.getElementById('subjects-container');
+        const students = ['Siddharth', 'Miguell', 'Pratham'];
+        let activeStudent = 'Siddharth';
+        let totalCheckboxes = 0;
+
+        // Render Syllabus Cards Once
+        function renderCards() {
+            syllabusData.forEach((subject, subjectIndex) => {
+                const card = document.createElement('div');
+                card.className = 'subject-card';
+                card.style.animationDelay = `${subjectIndex * 0.1}s`;
+                
+                let topicsHTML = '';
+                subject.topics.forEach((topic, topicIndex) => {
+                    totalCheckboxes++;
+                    // Using a generic ID here, we attach the user prefix during logic
+                    const genericId = `topic-${subjectIndex}-${topicIndex}`;
+                    topicsHTML += `
+                        <li class="topic-item">
+                            <input type="checkbox" id="${genericId}" class="task-check" onchange="toggleTopic('${genericId}')">
+                            <label class="topic-label" for="${genericId}">${topic}</label>
+                        </li>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="subject-header">
+                        <div class="subject-title">${subject.subject}</div>
+                        <div class="exam-date">${subject.date}</div>
+                    </div>
+                    <ul class="topic-list">${topicsHTML}</ul>
+                `;
+                container.appendChild(card);
+            });
+            // Initial load
+            updateAllProgressBars();
+            loadActiveStudentData();
+        }
+
+        // Switch Active Student
+        function switchUser(studentName) {
+            activeStudent = studentName;
+            
+            // Update Tab Styles
+            document.querySelectorAll('.user-tab').forEach(tab => tab.classList.remove('active'));
+            document.getElementById(`tab-${studentName}`).classList.add('active');
+
+            // Load new student's data into the checkboxes
+            loadActiveStudentData();
+        }
+
+        // When a checkbox is clicked
+        function toggleTopic(genericId) {
+            const isChecked = document.getElementById(genericId).checked;
+            const storageKey = `${activeStudent}_${genericId}`;
+            
+            // Save to LocalStorage under the active student's name
+            localStorage.setItem(storageKey, isChecked);
+            
+            // Update just the active student's progress bar
+            updateProgressBar(activeStudent);
+        }
+
+        // Load checkboxes based on active student
+        function loadActiveStudentData() {
+            document.querySelectorAll('.task-check').forEach(box => {
+                const storageKey = `${activeStudent}_${box.id}`;
+                const savedState = localStorage.getItem(storageKey);
+                box.checked = (savedState === 'true');
+            });
+        }
+
+        // Calculate and update a specific student's progress
+        function updateProgressBar(studentName) {
+            let checkedCount = 0;
+            // Iterate through all generic IDs to check this student's local storage
+            syllabusData.forEach((subject, sIdx) => {
+                subject.topics.forEach((topic, tIdx) => {
+                    const storageKey = `${studentName}_topic-${sIdx}-${tIdx}`;
+                    if(localStorage.getItem(storageKey) === 'true') {
+                        checkedCount++;
+                    }
+                });
+            });
+
+            const percentage = Math.round((checkedCount / totalCheckboxes) * 100) || 0;
+            document.getElementById(`fill-${studentName}`).style.width = `${percentage}%`;
+            document.getElementById(`text-${studentName}`).innerText = `${percentage}%`;
+        }
+
+        // Update all progress bars (used on initial load)
+        function updateAllProgressBars() {
+            students.forEach(student => updateProgressBar(student));
+        }
+
+        // Initialize the app
+        renderCards();
+
+    </script>
+</body>
+</html>
